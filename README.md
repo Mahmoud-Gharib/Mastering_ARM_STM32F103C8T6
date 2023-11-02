@@ -1,1 +1,2 @@
 # Mastering_ARM_STM32F103C8T6
+https://www.google.com/imgres?imgurl=https%3A%2F%2Fcb-electronics.com%2Fwp-content%2Fuploads%2F2020%2F03%2FSTM32F103C8T6-PIC-1-1.png&tbnid=o1GFWKyWMlO5zM&vet=12ahUKEwjLzYaSvaWCAxUHkScCHdhLBGUQMygEegQIARBU..i&imgrefurl=https%3A%2F%2Fcb-electronics.com%2Fproducts%2Fstm32f103c8t6%2F&docid=Kk4iscuw08wRgM&w=1514&h=1038&q=stm32f103c8t6&ved=2ahUKEwjLzYaSvaWCAxUHkScCHdhLBGUQMygEegQIARBU
