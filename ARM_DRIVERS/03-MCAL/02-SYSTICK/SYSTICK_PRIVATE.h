@@ -1,44 +1,38 @@
 /*==============================================================================*
- * File        : RCC_PRIVATE.h													*
- * Description : This file includes Addresses of RCC 						    *
+ * File        : SYSTICK_PRIVATE.h												*
+ * Description : This file includes Addresses of SYSTICK 						*
  * Author      : Mahmoud Gharib Embedded SW Engineer 							*
  * Date        : 																*
  * Git account : https://github.com/Mahmoud-Gharib								*
  * mail        : mahmoudgharib99999@gmail.com 		                            *
  * version     : 1 v                                                            *
  *==============================================================================*/
-#ifndef RCC_PRIVATE_H
-#define RCC_PRIVATE_H
+#ifndef SYSTICK_PRIVATE_H
+#define SYSTICK_PRIVATE_H
 
 /*==========================================================================*
 *	-----> Macros												  			*
-*			*  Base_Address is		   	0x40021000							*
+*			*  Base_Address is  		 0xE000E010 						*
 *===========================================================================*/
-#define MRCC_BASE_ADDRESS     0x40021000
+#define MSYSTICK_BASE_ADDRESS     0xE000E010
 
 /*================================================================*
 *	-----> Macros												  *
 *			*  Register Map										  *
 *=================================================================*/
-
 typedef struct
 {
-	volatile u32 RCC_CR       ;
-	volatile u32 RCC_CFGR     ;
-	volatile u32 RCC_CIR      ;
-	volatile u32 RCC_APB2RSTR ;
-	volatile u32 RCC_APB1RSTR ;
-	volatile u32 RCC_AHBENR   ;
-	volatile u32 RCC_APB2ENR  ;
-	volatile u32 RCC_APB1ENR  ;
-	volatile u32 RCC_BDCR     ;
-	volatile u32 RCC_CSR      ;
-}RCC_TypeDef;
+	volatile u32 SYSTICK_CTRL ;
+	volatile u32 SYSTICK_LOAD ;
+	volatile u32 SYSTICK_VAL  ;
+	volatile u32 SYSTICK_CALIB;
+}SYSTICK_TypeDef;
 
 /*================================================================*
 *	-)Struct Macros :											  *
-*			*  Base_Address RCC									  *
+*			*  Base_Address SYSTICK								  *
 *=================================================================*/
-#define MRCC      ((RCC_TypeDef *)MRCC_BASE_ADDRESS)
+#define MSYSTICK      ((SYSTICK_TypeDef *)MSYSTICK_BASE_ADDRESS)
+
 
 #endif 

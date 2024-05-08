@@ -5,6 +5,7 @@
  * Date        : 																	*
  * Git account : https://github.com/Mahmoud-Gharib									*
  * mail        : mahmoudgharib99999@gmail.com 										*
+ * version     : 1 v                                                           	    *
  *==================================================================================*/
 #ifndef RCC_INTERFACE_H
 #define RCC_INTERFACE_H
@@ -13,88 +14,101 @@
 #include "STD_TYPES.h"
 #include "BIT_MATH.h"
 
-/********** BUSES  **********/
-typedef enum
+/***************  CLOCK_SOURCE ****************/
+typedef enum 
 {
-	AHB_BUS  = 0  ,
-	APB1_BUS 	 ,
+	HSI                    = 0,
+	HSE                       ,
+	PLL                       ,
+	PLL_HSI_DIVIDED_BY_2      ,
+	PLL_HSE                   ,
+	PLL_HSE_DIVIDED_BY_2      ,
+	HSE_BYPASS          
+}CLOCK_SOURCE_T;
+
+/***************  BUS_ID ****************/
+typedef enum 
+{
+	AHB_BUS  = 0,
+	APB1_BUS    ,
 	APB2_BUS
-}BusName_t;
+}BUS_T;
 
-/**********  CLK_SRC   **********/
-#define  HSE   0U
-#define  HSI   1U
-#define  PLL   2U
+/***************  PERIPHERAL_State ****************/
+typedef enum 
+{
+	DISABLE_PERIPHERAL  = 0,
+	ENABLE_PERIPHERAL      ,
+	RESET_PERIPHERAL
+}PERIPHERAL_STATE_T;
 
-/********** HSE_SRC  **********/
-#define  HSE_CRYSTAL  0U
-#define  HSE_RC       1U
+/*************** Macro Peripheral of AHB Bus ****************/
+#define    RCC_DMA1           0
+#define    RCC_DMA2           1
+#define    RCC_SRAM           2
+#define    RCC_FLITF          4
+#define    RCC_CRC            6
+#define    RCC_FSMC           8
+#define    RCC_SDIO           10
+ 
+/*************** Macro Peripheral of APB2 Bus ****************/
+#define    RCC_AFIO          0
+#define    RCC_GPIOA         2
+#define    RCC_GPIOB         3
+#define    RCC_GPIOC         4
+#define    RCC_GPIOD         5
+#define    RCC_GPIOE         6
+#define    RCC_GPIOF         7
+#define    RCC_GPIOG         8
+#define    RCC_ADC1          9
+#define    RCC_ADC2          10
+#define    RCC_TIM1          11
+#define    RCC_SPI1          12
+#define    RCC_TIM8          13
+#define    RCC_USART1        14
+#define    RCC_ADC3          15
+#define    RCC_TIM9          19
+#define    RCC_TIM10         20
+#define    RCC_TIM11         21
 
-/********** PLL_SRC   **********/
-#define  PLL_HSE       			   0U
-#define  PLL_HSI_DIVIDED_BY_2       1U
-#define  PLL_HSE_DIVIDED_BY_2       2U
+/*************** Macro Peripheral of APB1 Bus ****************/
+#define    RCC_TIM2           0
+#define    RCC_TIM3           1
+#define    RCC_TIM4           2
+#define    RCC_WWDG           11
+#define    RCC_SPI2           14
+#define    RCC_SPI3           15
+#define    RCC_USART2         17
+#define    RCC_USART3         18
+#define    RCC_I2C1           21
+#define    RCC_I2C2           22
+#define    RCC_USB            23
+#define    RCC_CAN            25
+#define    RCC_BKP            27
+#define    RCC_PWR            28
+#define    RCC_DAC            29
 
-/*********** Macros Of :- RCC AHB CLK ENABLE ***************/
-
-#define _PERIPHERAL_EN_DMA1            0U 
-#define _PERIPHERAL_EN_DMA2            1U 
-#define _PERIPHERAL_EN_SRAM            2U            
-#define _PERIPHERAL_EN_FLITF           4U 
-#define _PERIPHERAL_EN_CRC             6U 
-#define _PERIPHERAL_EN_FSMC            8U 
-#define _PERIPHERAL_EN_SDIO            10U 
-
-/********* Macros Of :- RCC APB1 peripheral clock enable register *********/
-
-#define PERIPHERAL_EN_TIM2		       		0U
-#define PERIPHERAL_EN_TIM3		       		1U
-#define PERIPHERAL_EN_TIM4		       		2U
-#define PERIPHERAL_EN_TIM5		       	    3U
-#define PERIPHERAL_EN_TIM6		       		4U
-#define PERIPHERAL_EN_TIM7		       		5U
-#define PERIPHERAL_EN_TIM12		       	    6U
-#define PERIPHERAL_EN_TIM13		       	    7U
-#define PERIPHERAL_EN_TIM14		       	    8U
-#define PERIPHERAL_EN_WWDG		       		11U
-#define PERIPHERAL_EN_SPI2		       		14U
-#define PERIPHERAL_EN_SPI3		       		15U
-#define PERIPHERAL_EN_UART2		       		17U
-#define PERIPHERAL_EN_UART3		       		18U
-#define PERIPHERAL_EN_UART4		       		19U
-#define PERIPHERAL_EN_UART5		       		20U
-#define PERIPHERAL_EN_I2C1		       		21U
-#define PERIPHERAL_EN_I2C2		       		22U
-#define PERIPHERAL_EN_USB		       		23U
-#define PERIPHERAL_EN_CAN		       		25U
-#define PERIPHERAL_EN_BKP              		27U
-#define PERIPHERAL_EN_PWR		       		28U
-#define PERIPHERAL_EN_DAC		       		29U
-
-/**********  Macros Of :- RCC APB2 peripheral clock enable register (RCC_APB2ENR) *********/
-
-#define PERIPHERAL_EN_AFIO          0U
-#define PERIPHERAL_EN_GPIOA         2U
-#define PERIPHERAL_EN_GPIOB         3U
-#define PERIPHERAL_EN_GPIOC         4U
-#define PERIPHERAL_EN_GPIOD         5U
-#define PERIPHERAL_EN_GPIOE         6U
-#define PERIPHERAL_EN_GPIOF         7U
-#define PERIPHERAL_EN_GPIOG         8U
-#define PERIPHERAL_EN_ADC1          9U
-#define PERIPHERAL_EN_ADC2          10U
-#define PERIPHERAL_EN_TIM1          11U
-#define PERIPHERAL_EN_SPI1          12U
-#define PERIPHERAL_EN_TIM8          13U
-#define PERIPHERAL_EN_USART1        14U
-#define PERIPHERAL_EN_ADC3          15U
-#define PERIPHERAL_EN_TIM9          19U
-#define PERIPHERAL_EN_TIM10         20U
-#define PERIPHERAL_EN_TIM11         21U
+/*************** Macro ClockFactor For PLL ****************/
+#define NO_CLOCK_FACTOR                                0b0000
+#define PLL_CLOCK_MULTIPLE_BY_2                        0b0000
+#define PLL_CLOCK_MULTIPLE_BY_3					       0b0001
+#define PLL_CLOCK_MULTIPLE_BY_4                        0b0010
+#define PLL_CLOCK_MULTIPLE_BY_5                        0b0011
+#define PLL_CLOCK_MULTIPLE_BY_6                        0b0100
+#define PLL_CLOCK_MULTIPLE_BY_7                        0b0101
+#define PLL_CLOCK_MULTIPLE_BY_8                        0b0110
+#define PLL_CLOCK_MULTIPLE_BY_9                        0b0111
+#define PLL_CLOCK_MULTIPLE_BY_10                       0b1000
+#define PLL_CLOCK_MULTIPLE_BY_11                       0b1001
+#define PLL_CLOCK_MULTIPLE_BY_12                       0b1010
+#define PLL_CLOCK_MULTIPLE_BY_13                       0b1011
+#define PLL_CLOCK_MULTIPLE_BY_14                       0b1100
+#define PLL_CLOCK_MULTIPLE_BY_15                       0b1101
+#define PLL_CLOCK_MULTIPLE_BY_16                       0b1110
 
 /*******************     Function Prototypes     **************************/
-void MRCC_voidInitSystemCLK(void);
-void MRCC_voidEnableClock(BusName_t BusName , u8 Copy_u8PerNum );
-void MRCC_voidDisableClock(BusName_t BusName , u8 Copy_u8PerNum );
+void MRCC_voidInit( void );
+void MRCC_voidEnablePeripheralClock ( BUS_T BUS_ID   , u8 Copy_u8Peripheral );
+void MRCC_voidDisablePeripheralClock( BUS_T BUS_ID   , u8 Copy_u8Peripheral );
 
-#endif
+#endif 

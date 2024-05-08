@@ -1,145 +1,118 @@
-/*==================================================================================*
+  /*=================================================================================*
  * File        : RCC_PROGRAM.c														*
  * Description : This file includes RCC implementations 					     	*
  * Author      : Mahmoud Gharib Embedded SW Engineer 								*
  * Date        : 																	*
  * Git account : https://github.com/Mahmoud-Gharib									*
  * mail        : mahmoudgharib99999@gmail.com 										*
+ * version     : 1 v                                                           	    *
  *==================================================================================*/
-
-/*************** LIB ****************/
+ 
+ /*************** LIB ****************/
 #include "STD_TYPES.h"
 #include "BIT_MATH.h"
 
 /***************  MCAL  *************/
-#include "RCC_PRIVATE.h"
 #include "RCC_INTERFACE.h"
+#include "RCC_PRIVATE.h"
 #include "RCC_CONFIG.h"
 
 
-/*==================================================================================================*
- * Prototype   : void MRCC_voidInitSystemCLK(void);													*
- * Description : Function Set The Clock Source														*
- *               		1- HSI   		                                                            *
- *               		2- HSE   		                                                            *
- *               		3- PLL		                                                                *
- * Arguments   : void    																			*
- * return      : void																				*
- *==================================================================================================*/
-void MRCC_voidInitSystemCLK(void)
+void MRCC_voidInit( void )
 {
-	/********** HSI **********/
-#if CLKSRC == HSI 
-	/* 1- EN HSI */
-	SET_BIT(MRCC->CR , 0U);
-	/* 2- CLK SYS --> HSI */
-	CLR_BIT(MRCC->CFGR, 0U);
-	CLR_BIT(MRCC->CFGR, 1U);
+#if   RCC_CLOCK_TYPE == HSI
+		/* 1- EN HSI */
+		SET_BIT( MRCC -> RCC_CR   , 0  );
+		/* 2- CLK SYS --> HSI */
+		CLR_BIT( MRCC -> RCC_CFGR , 0  );
+		CLR_BIT( MRCC -> RCC_CFGR , 1  );
+	#elif RCC_CLOCK_TYPE == HSE
+		/* 1- EN HSE */
+		SET_BIT( MRCC -> RCC_CR   , 16 );
+		/* 2- Disable BYP */
+		CLR_BIT( MRCC  -> RCC_CR  , 18 );
+		/* 3 - CLK SYS --> HSE */
+		SET_BIT( MRCC -> RCC_CFGR , 0  );
+		CLR_BIT( MRCC -> RCC_CFGR , 1  );
 
-	/********** HSE **********/
-#elif CLKSRC == HSE
+	#elif RCC_CLOCK_TYPE == PLL
+		/* BIT 1:0 -> Choose Between HSI OR HSE OR PLL */
+		/* PLL Selected As A System Clock */
+		CLR_BIT( MRCC -> RCC_CFGR , 0  );
+		SET_BIT( MRCC -> RCC_CFGR , 1  );
+		/* Choosing The Multiplication Factor For PLL */
+		#if ( PPL_CLOCK_FACTOR >= NO_CLOCK_FACTOR ) && ( PPL_CLOCK_FACTOR <= PLL_CLOCK_MULTIPLE_BY_16)
+		MRCC -> RCC_CFGR &= ~( ( 0b1111 )     << 18 ) ;
+		MRCC -> RCC_CFGR |=  ( PPL_CLOCK_FACTOR ) << 18   ;
+		#endif
+		/*The Start Of Nested #IF*/
+		#if PLL_SOURCE == PLL_HSI_DIVIDED_BY_2
+			/* BIT 16 -> Choose PLL Source -> If HSI/2 OR HSE */
+			/* PLL Entery Clock Source Is HSI Divided By 2 */
+			CLR_BIT( MRCC -> RCC_CFGR , 16 );
+		#elif PLL_SOURCE == PLL_HSE
 
-#if HSE_SRC == HSE_CRYSTAL
-	/* 1- EN HSE */
-	SET_BIT(MRCC->CR , 16U);
-	/* 2- Disable BYP */
-	CLR_BIT(MRCC->CR,18U);
-	/* 3- CLK SYS --> HSE */
-	SET_BIT(MRCC->CFGR, 0U);
-	CLR_BIT(MRCC->CFGR, 1U);
+			/* Bit 16 -> Enable The HSE Clock */
+			SET_BIT( MRCC -> RCC_CR   , 16 );
 
-#elif HSE_SRC == HSE_RC
-	/* 1- EN HSE */
-	SET_BIT(MRCC->CR , 16U);
-	/* 2- Enable BYP */
-	SET_BIT(MRCC->CR,18U);
-	/* 3- CLK SYS --> HSE */
-	SET_BIT(MRCC->CFGR, 0U);
-	CLR_BIT(MRCC->CFGR, 1U);
-#else
-	/* Error*/
-#endif
+			/* BIT 16 -> Choose PLL Source -> If HSI/2 OR HSE */
+			/* PLL Entery Clock Source Is HSE */
+			SET_BIT( MRCC -> RCC_CFGR , 16 );
 
-	/********** PLL **********/
-#elif CLKSRC == PLL	
+			/* BIT 17 -> IF PLL Source IS HSE Then Choose Between Divide HSE/2 Or Not  */
+			/* HSE Is Not Divided */
+			CLR_BIT( MRCC -> RCC_CFGR , 17 );
 
-#if PLL_SRC == PLL_HSE
-	/*1-Enable HSE */
-	SET_BIT(MRCC->CR,16U);
-	/*2- EN PLL*/
-	SET_BIT(MRCC->CR,24U);
-	/* 3- PLL From HSE */
-	SET_BIT( MRCC->CFGR , 16 );
-	CLR_BIT( MRCC->CFGR , 17 );
-	/* 4- System Clk  PLL */
-	CLR_BIT(MRCC->CFGR,0U);
-	SET_BIT(MRCC->CFGR,1U);
+		#elif PLL_SOURCE == PLL_HSE_DIVIDED_BY_2
 
-#elif PLL_SRC == PLL_HSI_DIVIDED_BY_2
-	/*Enable HSI */
-	SET_BIT(MRCC->CR,0U);
-	/*2- EN PLL*/
-	SET_BIT(MRCC->CR,24U);
-	/* 3- PLL From HSI */
-	CLR_BIT( MRCC->CFGR , 16);
-	/* 4- System Clk  PLL */
-	CLR_BIT(MRCC->CFGR,0U);
-	SET_BIT(MRCC->CFGR,1U);
+			/* Bit 16 -> Enable The HSE Clock */
+			SET_BIT( MRCC -> RCC_CR   , 16 );
 
-#elif PLL_SRC == PLL_HSE_DIVIDED_BY_2
-	/*1-Enable HSE */
-	SET_BIT(MRCC->CR,16U);
-	/*2- EN PLL*/
-	SET_BIT(MRCC->CR,24U);
-	/* 3- PLL From HSE */
-	SET_BIT( MRCC->CFGR , 16 );
-	SET_BIT( MRCC->CFGR , 17 );
-	/* 4- System Clk  PLL */
-	CLR_BIT(MRCC->CFGR,0U);
-	SET_BIT(MRCC->CFGR,1U);
-#else
-	/* Error*/
-#endif
-#else 
-	/******   ERROR   ********/
-#endif
+			/* BIT 16 -> Choose PLL Source -> If HSI/2 OR HSE */
+			/* PLL Entery Clock Source Is HSE */
+			SET_BIT( MRCC -> RCC_CFGR , 16 );
+
+			/* BIT 17 -> IF PLL Source IS HSE Then Choose Between Divide HSE/2 Or Not  */
+			/* HSE Is Divided By Two */
+			SET_BIT( MRCC -> RCC_CFGR , 17 );
+
+			/*The End Of Nested IF*/
+		#endif
+
+		/* PLL Clock Enable */
+		SET_BIT( MRCC->CR , 24 );
+
+	#elif RCC_CLOCK_TYPE == HSE_BYPASS
+		/* 1- EN HSE */
+		SET_BIT( MRCC -> RCC_CR   , 16 );
+		/* 2- Enable BYP */
+		SET_BIT( MRCC -> RCC_CR   , 18 );
+		/* 3- CLK SYS --> HSE */
+		SET_BIT( MRCC -> RCC_CFGR , 0  );
+		CLR_BIT( MRCC -> RCC_CFGR , 1  );
+
+	#endif
+
 }
 
-/*==================================================================================================*
- * Prototype   : void MRCC_voidEnableClock(BusName_t BusName , u8 Copy_u8PerNum );			     	*
- * Description : Function To Enable Prepheral Clock													*
- * Arguments   : 1) BusName_t      :  The Bus Of The Prepheral ( AHB , APB1 , APB2 ) 				*
- *  			 2) Copy_u8PerName :  The Order Of Prepheral On The Selected Reg     				*																			*
- * return      : void																				*
- *==================================================================================================*/
-void MRCC_voidEnableClock(BusName_t BusName , u8 Copy_u8PerNum )
+void MRCC_voidEnablePeripheralClock ( BUS_T BUS_ID  , u8 Copy_u8Peripheral )
 {
-	switch(BusName)
-	{
-	case AHB_BUS:   SET_BIT(MRCC -> AHBENR  , Copy_u8PerNum );         break ;
-	case APB1_BUS:  SET_BIT(MRCC -> APB1ENR , Copy_u8PerNum );         break ;
-	case APB2_BUS:  SET_BIT(MRCC -> APB2ENR , Copy_u8PerNum );         break ;
-	default :     /******   ERROR   ********/          break ;
-	}
+	switch( BUS_ID ) 
+    {
+    	case AHB_BUS :  SET_BIT( MRCC -> RCC_AHBENR   , Copy_u8Peripheral ); break;
+    	case APB1_BUS:  SET_BIT( MRCC -> RCC_APB1ENR  , Copy_u8Peripheral ); break;
+    	case APB2_BUS:  SET_BIT( MRCC -> RCC_APB2ENR  , Copy_u8Peripheral ); break;
+		default : 	 /**** Do Nothing *****/			break;
+	}	
 }
 
-/*==================================================================================================*
- * Prototype   : void MRCC_voidDisableClock(BusName_t BusName , u8 Copy_u8PerNum );			     	*
- * Description : Function To Disable Prepheral Clock												*
- * Arguments   : 1) BusName_t      :  The Bus Of The Prepheral ( AHB , APB1 , APB2 ) 				*
- *  			 2) Copy_u8PerName :  The Order Of Prepheral On The Selected Reg     				*																			*
- * return      : void																				*
- *==================================================================================================*/
-void MRCC_voidDisableClock(BusName_t BusName , u8 Copy_u8PerNum )
+void MRCC_voidDisablePeripheralClock( BUS_T BUS_ID  , u8 Copy_u8Peripheral )
 {
-	switch(BusName)
-	{
-	case AHB_BUS:  CLR_BIT( MRCC -> AHBENR  , Copy_u8PerNum );         break ;
-	case APB1_BUS: CLR_BIT( MRCC -> APB1ENR , Copy_u8PerNum );         break ;
-	case APB2_BUS: CLR_BIT( MRCC -> APB2ENR , Copy_u8PerNum );         break ;
-	default :     /******   ERROR   ********/          break ;
-	}
+	switch( BUS_ID ) 
+    {
+    	case AHB_BUS :  CLR_BIT( MRCC -> RCC_AHBENR   , Copy_u8Peripheral ); break;
+    	case APB1_BUS:  CLR_BIT( MRCC -> RCC_APB1ENR  , Copy_u8Peripheral ); break;
+    	case APB2_BUS:  CLR_BIT( MRCC -> RCC_APB2ENR  , Copy_u8Peripheral ); break;
+    	default : 	 /**** Do Nothing *****/			break;
+    }	
 }
-
-
-
